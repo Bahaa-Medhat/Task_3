@@ -81,6 +81,30 @@ export default function AllPerks() {
     }
   }
 
+  // ------------------------------------------------------------------
+  // Effect: Initial load (on mount)
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    // Load all perks when component mounts
+    loadAllPerks()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ------------------------------------------------------------------
+  // Effect: Auto-search with debounce when searchQuery or merchantFilter changes
+  // ------------------------------------------------------------------
+  useEffect(() => {
+    // Debounce to avoid firing on every keystroke
+    const timer = setTimeout(() => {
+      loadAllPerks()
+    }, 500)
+
+    return () => clearTimeout(timer)
+    // We intentionally depend on searchQuery and merchantFilter so
+    // the search happens automatically when they change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, merchantFilter])
+
   // ==================== EVENT HANDLERS ====================
 
   
@@ -136,7 +160,8 @@ export default function AllPerks() {
                 type="text"
                 className="input"
                 placeholder="Enter perk name..."
-                
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
               />
               <p className="text-xs text-zinc-500 mt-1">
                 Auto-searches as you type, or press Enter / click Search
@@ -151,7 +176,8 @@ export default function AllPerks() {
               </label>
               <select
                 className="input"
-                
+                value={merchantFilter}
+                onChange={e => setMerchantFilter(e.target.value)}
               >
                 <option value="">All Merchants</option>
                 
@@ -217,7 +243,7 @@ export default function AllPerks() {
           
           <Link
             key={perk._id}
-           
+            to={`/perks/${perk._id}`}
             className="card hover:shadow-lg transition-shadow cursor-pointer"
           >
             {/* Perk Title */}
